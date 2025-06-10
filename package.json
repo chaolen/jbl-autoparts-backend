@@ -1,0 +1,38 @@
+{
+  "name": "system-backend",
+  "version": "1.0.25",
+  "repository": "",
+  "description": "",
+  "main": "src/server.js",
+  "bin": {},
+  "files": [],
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "authentication",
+    "express",
+    "api",
+    "node",
+    "backend",
+    "login",
+    "signup"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "cors": "^2.8.5",
+    "cross-spawn": "^7.0.3",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "helmet": "^6.0.1",
+    "hpp": "^0.2.3",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^6.10.0",
+    "multer": "^1.4.5-lts.2",
+    "nodemon": "^2.0.20",
+    "validator": "^13.9.0"
+  }
+}

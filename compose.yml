@@ -1,0 +1,13 @@
+services:
+  mongodb:
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    container_name: jbl-system-server
+    restart: unless-stopped
+    user: '501'  # Replace '1000' with your actual UID
+    environment:
+      - MONGODB_INITDB_ROOT_USERNAME=admin
+      - MONGODB_INITDB_ROOT_PASSWORD=admin123
+    ports:
+      - '27017:27017'
+    volumes:
+      - './data:/data/db'
