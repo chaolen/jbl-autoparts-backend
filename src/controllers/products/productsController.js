@@ -4,6 +4,8 @@ const SKU = require("../../models/sku.model");
 const ErrorCodes = require("../../utils/ErrorCodes");
 const fs = require('fs');
 const path = require('path');
+const uploadToCloudinary = require("../../utils/uploadToCloudinary");
+
 
 const getProductById = async (req, res, next) => {
   try {
@@ -159,7 +161,15 @@ const createProduct = async (req, res) => {
     const existingImages = req.body.existingImages
       ? JSON.parse(req.body.existingImages)
       : [];
-    const newImagePaths = uploadedFiles.map((file) => file.path);
+    console.log(req.body);
+    console.log(uploadedFiles);
+    const newImagePaths = await Promise.all(
+      uploadedFiles.map((file) =>{
+        console.log(file.buffer, file.originalname)
+        return uploadToCloudinary(file.buffer, file.originalname)
+      })
+    );
+
     const finalImages = [...existingImages, ...newImagePaths];
     const {
       description,
@@ -257,10 +267,14 @@ const updateProduct = async (req, res) => {
     const existingImages = req.body.existingImages
       ? JSON.parse(req.body.existingImages)
       : [];
-    const newImagePaths = uploadedFiles.map((file) => file.path);
+    const newImagePaths = await Promise.all(
+      uploadedFiles.map((file) =>
+        uploadToCloudinary(file.buffer, file.originalname)
+      )
+    );
     const finalImages = [...existingImages, ...newImagePaths];
-
     body.images = finalImages;
+
     delete body.existingImages;
 
     const existingProduct = await Product.findById(productId);

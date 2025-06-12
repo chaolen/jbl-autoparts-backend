@@ -7,7 +7,7 @@
   "bin": {},
   "files": [],
   "scripts": {
-    "start": "node src/server.js",
+    "start": "nodemon start src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -23,6 +23,7 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.0",
+    "cloudinary": "^2.6.1",
     "cors": "^2.8.5",
     "cross-spawn": "^7.0.3",
     "dotenv": "^16.0.3",
