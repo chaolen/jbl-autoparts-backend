@@ -733,6 +733,56 @@ const getSalesStatistics = async (req, res, next) => {
       },
     ]);
 
+    const [inventoryValueResult] = await Products.aggregate([
+      {
+        $match: {
+          quantityRemaining: { $gt: 0 },
+          is_deleted: false,
+        },
+      },
+      {
+        $project: {
+          inventoryValue: { $multiply: ["$quantityRemaining", "$price"] },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalInventoryValue: { $sum: "$inventoryValue" },
+        },
+      },
+    ]);
+
+    const totalInventoryValue = inventoryValueResult?.totalInventoryValue || 0;
+
+    const [lastMonthInventoryValueResult] = await Products.aggregate([
+      {
+        $match: {
+          quantityRemaining: { $gt: 0 },
+          is_deleted: false,
+          updatedAt: { $gte: startOfLastMonth, $lt: endOfLastMonth },
+        },
+      },
+      {
+        $project: {
+          inventoryValue: { $multiply: ["$quantityRemaining", "$price"] },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalInventoryValue: { $sum: "$inventoryValue" },
+        },
+      },
+    ]);
+
+    const lastMonthInventoryValue = lastMonthInventoryValueResult?.totalInventoryValue || 0;
+
+    const inventoryValueTrend =
+      lastMonthInventoryValue === 0
+        ? 100
+        : ((totalInventoryValue - lastMonthInventoryValue) / lastMonthInventoryValue) * 100;
+
     const currentSales = totalSalesStats?.totalSales || 0;
     const currentIncome = totalSalesStats?.totalIncome || 0;
     const lastSales = lastMonthStats?.totalSales || 0;
@@ -808,8 +858,8 @@ const getSalesStatistics = async (req, res, next) => {
 
     const lowStockTrend =
       lowStockLastMonth === 0
-        ? 100
-        : ((lowStockCount - lowStockLastMonth) / lowStockLastMonth) * 100;
+      ? 100
+      : ((lowStockCount - lowStockLastMonth) / lowStockLastMonth) * 100;
 
     return res.json({
       status: "success",
@@ -820,11 +870,13 @@ const getSalesStatistics = async (req, res, next) => {
         total_expenses: 0,
         active_products: activeProducts,
         low_stock: lowStockCount,
+        total_inventory_value: totalInventoryValue,
         trends: {
           total_sales: salesTrend,
           total_income: incomeTrend,
           active_products: activeProductTrend,
           low_stock: lowStockTrend,
+          total_inventory_value: inventoryValueTrend,
         },
         daily_sales: paddedDailySales,
         weekly_sales: paddedWeeklySales,
